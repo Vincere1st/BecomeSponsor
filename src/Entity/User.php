@@ -2,63 +2,139 @@
 
 namespace App\Entity;
 
-use App\Repository\StudentRepository;
-use Doctrine\Common\Collections\ArrayCollection;
+use App\Repository\UserRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV4;
 
-#[ORM\Entity(repositoryClass: StudentRepository::class)]
-class Student
+#[ORM\Entity(repositoryClass: UserRepository::class)]
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
-    #[ORM\Column(type:"uuid", unique:true)]
-    #[ORM\GeneratedValue(strategy:"CUSTOM")]
-    #[ORM\CustomIdGenerator(class:"doctrine.uuid_generator")]
-    private $uuid;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    private UuidV4 $id;
+
+    #[ORM\Column(type: 'string', length: 180, unique: true)]
+    private ?string $email;
+
+    #[ORM\Column(type: 'json')]
+    private array $roles = [];
+
+    #[ORM\Column(type: 'string')]
+    private string $password;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $firstname;
+    private ?string $firstname;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $lastname;
-
-    #[ORM\Column(type: 'string', length: 255)]
-    private $email;
+    private ?string $lastname;
 
     #[ORM\Column(type: 'string', length: 20, nullable: true)]
-    private $phone;
+    private ?string $phone;
 
     #[ORM\Column(type: 'date', nullable: true)]
-    private $birthdate;
+    private ?\DateTimeInterface $birthdate;
 
     #[ORM\Column(type: 'string', length: 2, nullable: true)]
-    private $sex;
+    private ?string $sex;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $github;
+    private ?string $github;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $linkedin;
+    private ?string $linkedin;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $picture;
+    private ?string $picture;
 
-    #[ORM\ManyToMany(targetEntity: Session::class, mappedBy: 'students')]
-    private $sessions;
+    #[ORM\ManyToMany(targetEntity: Session::class, mappedBy: 'users')]
+    private Collection $sessions;
 
     #[ORM\ManyToMany(targetEntity: Language::class)]
-    private $languages;
+    private Collection $languages;
 
     public function __construct()
     {
-        $this->sessions = new ArrayCollection();
-        $this->languages = new ArrayCollection();
+        $this->id = $this->createUuid();
     }
 
-    public function getUuid(): ?Uuid
+    public function getId(): UuidV4
     {
-        return $this->uuid;
+        return $this->id;
+    }
+
+    private function createUuid(): UuidV4
+    {
+        return Uuid::v4();
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): self
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials()
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
     }
 
     public function getFirstname(): ?string
@@ -81,18 +157,6 @@ class Student
     public function setLastname(string $lastname): self
     {
         $this->lastname = $lastname;
-
-        return $this;
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): self
-    {
-        $this->email = $email;
 
         return $this;
     }
@@ -170,7 +234,7 @@ class Student
     }
 
     /**
-     * @return Collection<int, Session>
+     * @return Collection<UuidV4, Session>
      */
     public function getSessions(): Collection
     {
@@ -181,7 +245,7 @@ class Student
     {
         if (!$this->sessions->contains($session)) {
             $this->sessions[] = $session;
-            $session->addStudent($this);
+            $session->addUser($this);
         }
 
         return $this;
@@ -190,14 +254,14 @@ class Student
     public function removeSession(Session $session): self
     {
         if ($this->sessions->removeElement($session)) {
-            $session->removeStudent($this);
+            $session->removeUser($this);
         }
 
         return $this;
     }
 
     /**
-     * @return Collection<int, Language>
+     * @return Collection<UuidV4, Language>
      */
     public function getLanguages(): Collection
     {

@@ -7,15 +7,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV4;
 
 #[ORM\Entity(repositoryClass: SchoolRepository::class)]
 class School
 {
     #[ORM\Id]
     #[ORM\Column(type:"uuid", unique:true)]
-    #[ORM\GeneratedValue(strategy:"CUSTOM")]
-    #[ORM\CustomIdGenerator(class:"doctrine.uuid_generator")]
-    private $uuid;
+    private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
     private $name;
@@ -29,12 +28,21 @@ class School
 
     public function __construct()
     {
+        $this->id = $this->createUuid();
         $this->sessions = new ArrayCollection();
     }
 
-    public function getUuid(): ?Uuid
+    /**
+     * @return UuidV4
+     */
+    public function getId(): UuidV4
     {
-        return $this->uuid;
+        return $this->id;
+    }
+
+    private function createUuid(): UuidV4
+    {
+        return Uuid::v4();
     }
 
     public function getName(): ?string
