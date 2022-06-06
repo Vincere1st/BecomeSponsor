@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Country;
+use App\Entity\Language;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Country>
+ * @extends ServiceEntityRepository<Language>
  *
- * @method Country|null find($id, $lockMode = null, $lockVersion = null)
- * @method Country|null findOneBy(array $criteria, array $orderBy = null)
- * @method Country[]    findAll()
- * @method Country[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Language|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Language|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Language[]    findAll()
+ * @method Language[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class CountryRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Country::class);
+        parent::__construct($registry, Language::class);
     }
 
-    public function add(Country $entity, bool $flush = false): void
+    public function add(Language $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class CountryRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Country $entity, bool $flush = false): void
+    public function remove(Language $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,24 +40,24 @@ class CountryRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Country[] Returns an array of Country objects
+//     * @return Language[] Returns an array of Language objects
 //     */
 //    public function findByExampleField($value): array
 //    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
+//        return $this->createQueryBuilder('l')
+//            ->andWhere('l.exampleField = :val')
 //            ->setParameter('val', $value)
-//            ->orderBy('c.id', 'ASC')
+//            ->orderBy('l.id', 'ASC')
 //            ->setMaxResults(10)
 //            ->getQuery()
 //            ->getResult()
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Country
+//    public function findOneBySomeField($value): ?Language
 //    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
+//        return $this->createQueryBuilder('l')
+//            ->andWhere('l.exampleField = :val')
 //            ->setParameter('val', $value)
 //            ->getQuery()
 //            ->getOneOrNullResult()

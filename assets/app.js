@@ -7,7 +7,9 @@
 
 // any CSS you import will output into a single css file (app.css in this case)
 import './styles/app.css';
-import './styles/global.scss';
+// import './styles/global.scss';
+import 'materialize-css/dist/js/materialize'
+import "materialize-css/sass/materialize.scss";
 
 // start the Stimulus application
 import './bootstrap';

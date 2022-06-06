@@ -59,6 +59,7 @@ Encore
     .enableSassLoader()
 
     // uncomment if you use TypeScript
+    // uncomment if you use TypeScript
     //.enableTypeScriptLoader()
 
     // uncomment if you use React
